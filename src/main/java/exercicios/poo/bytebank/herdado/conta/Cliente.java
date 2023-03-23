@@ -1,6 +1,9 @@
 package exercicios.poo.bytebank.herdado.conta;
 
-public class Cliente {
+import java.io.Serializable;
+
+public class Cliente implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String nome;
     private String cpf;
