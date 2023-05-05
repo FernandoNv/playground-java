@@ -1,4 +1,4 @@
-package exercicios.codewars;
+package exercicios.codingProblems;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

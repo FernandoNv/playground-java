@@ -1,4 +1,4 @@
-package exercicios.codewars;
+package exercicios.codingProblems;
 
 
 import java.util.ArrayList;
