@@ -12,7 +12,7 @@ import java.util.Stack;
 //
 //Follow-up: Does your solution work for the following cases: "hello/world:here/", "hello//world:here"
 public class Q685 {
-    private static Set<Character> characterSet = new HashSet<>();
+    private static final Set<Character> characterSet = new HashSet<>();
     static {
         characterSet.add('/');
         characterSet.add(':');
