@@ -1,43 +1,60 @@
 package exercicios.mdbRequest;
 
+import exercicios.mdbRequest.exceptions.ValidateYearException;
+import exercicios.mdbRequest.models.VisualContent;
+import exercicios.mdbRequest.services.FileService;
+import exercicios.mdbRequest.services.GsonService;
+import exercicios.mdbRequest.services.OMDBService;
+
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 
 //belib50516@namewok.com
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
+        String title = "";
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Informe o nome do filme/serie: ");
-        String title = scanner.nextLine();
-        title = title.trim().replaceAll(" ", "+");
-        String url = String.format("http://www.omdbapi.com/?t=%s&apikey=7735df76", title);
-//        System.out.println(url);
+        List<VisualContent> visualContents = new ArrayList<>();
+        OMDBService omdbService = new OMDBService();
+        GsonService gsonService = new GsonService();
+        FileService fileService = new FileService(gsonService);
+        String filepath = "movies.json";
 
-        HttpClient httpClient = HttpClient.newHttpClient();
-        HttpRequest request = googleBookRequest();
+        while (!title.equalsIgnoreCase("exit")){
+            System.out.print("Write the movie/tv-series name: ");
+            try {
+                title = scanner.nextLine();
+                title = title.trim().replaceAll(" ", "+");
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
+                if(title.equalsIgnoreCase("exit")){
+                    break;
+                }
 
-        request = mdbRequest(url);
-        response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
+                HttpResponse<String> response = omdbService.getVisualContentResponse(title);
+                String json = response.body();
+                VisualContent visualContent = gsonService.toVisualContent(json);
+
+                visualContents.add(visualContent);
+                System.out.println("Visual Content added...");
+            } catch (NumberFormatException exception) {
+                System.out.println("Error formatting the data to int");
+                System.out.println(exception.getMessage());
+            } catch (IllegalArgumentException exception) {
+                System.out.println("Error creating uri");
+                System.out.println(exception.getMessage());
+            } catch (ValidateYearException exception) {
+                System.out.println(exception.getMessage());
+            }finally {
+                System.out.println("Process ending...");
+            }
+        }
+
+        System.out.println(visualContents);
+        fileService.writeData(visualContents, filepath);
     }
 
-    public static HttpRequest googleBookRequest(){
-        return HttpRequest.newBuilder()
-                .uri(URI.create("https://www.googleapis.com/books/v1/volumes?q=harry+potter"))
-                .build();
-    }
-
-    public static HttpRequest mdbRequest(String url){
-        return HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .build();
-    }
 }
